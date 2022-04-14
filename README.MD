@@ -13,131 +13,98 @@ Un alternativa è usare il *Sottosistema Windows per Linux* (**WSL**) consente a
 
 ### Installazione WSL
 
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
 
-## Rename a file
-
-You can rename the current file by clicking the file name in the navigation bar or by clicking the **Rename** button in the file explorer.
-
-## Delete a file
-
-You can delete the current file by clicking the **Remove** button in the file explorer. The file will be moved into the **Trash** folder and automatically deleted after 7 days of inactivity.
-
-## Export a file
-
-You can export the current file by clicking **Export to disk** in the menu. You can choose to export the file as plain Markdown, as HTML using a Handlebars template or as a PDF.
+![](https://github.com/zaknafein83/installazione-Docker-tramite-WSL/blob/master/powershell-admin.png)
 
 
-# Synchronization
+Avviare la **PowerShell** di Windows con i privilegi di amministratore e digitare il seguente comando
 
-Synchronization is one of the biggest features of StackEdit. It enables you to synchronize any file in your workspace with other files stored in your **Google Drive**, your **Dropbox** and your **GitHub** accounts. This allows you to keep writing on other devices, collaborate with people you share the file with, integrate easily into your workflow... The synchronization mechanism takes place every minute in the background, downloading, merging, and uploading file modifications.
+    wsl --install
 
-There are two types of synchronization and they can complement each other:
+Se tutto è configurato **correttamente**, sulla vostra *PowerShell*  dovreste avere configurato la *bash di Ubuntu* senza alcun problema. Nel caso in cui doveste avere problemi, è invece necessario seguire la seguente procedura.
+#### Abilitare Windows Subsystem for Linux (WSL)
 
-- The workspace synchronization will sync all your files, folders and settings automatically. This will allow you to fetch your workspace on any other device.
-	> To start syncing your workspace, just sign in with Google in the menu.
+    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+#### Abilitare WSL
 
-- The file synchronization will keep one file of the workspace synced with one or multiple files in **Google Drive**, **Dropbox** or **GitHub**.
-	> Before starting to sync files, you must link an account in the **Synchronize** sub-menu.
+    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 
-## Open a file
+#### Aggiornamento del Kernel Linux
+Scaricare ed installare uno dei seguenti aggiornamenti a seconda della vostra architettura della macchina.
 
-You can open a file from **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Open from**. Once opened in the workspace, any modification in the file will be automatically synced.
+    https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
 
-## Save a file
+    https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_arm64.msi
+#### Impostare WSL come versione di Default
 
-You can save any file of the workspace to **Google Drive**, **Dropbox** or **GitHub** by opening the **Synchronize** sub-menu and clicking **Save on**. Even if a file in the workspace is already synced, you can save it to another location. StackEdit can sync one file with multiple locations and accounts.
+    wsl --set-default-version 2
+#### Installare una versione di Linux 
+In questo step finale basterà scaricare ed installare Ubuntu dal Microsoft Store e create la vostra user esempio come **username** e poi scegliete una **password**.
 
-## Synchronize a file
-
-Once your file is linked to a synchronized location, StackEdit will periodically synchronize it by downloading/uploading any modification. A merge will be performed if necessary and conflicts will be resolved.
-
-If you just have modified your file and you want to force syncing, click the **Synchronize now** button in the navigation bar.
-
-> **Note:** The **Synchronize now** button is disabled if you have no file to synchronize.
-
-## Manage file synchronization
-
-Since one file can be synced with multiple locations, you can list and manage synchronized locations by clicking **File synchronization** in the **Synchronize** sub-menu. This allows you to list and remove synchronized locations that are linked to your file.
+> Usate dei dati che ricordate, essendo queste le credenziali che vi permetteranno di accedere a questo ambiente virtuale installato sulla vostra macchina.
 
 
-# Publication
-
-Publishing in StackEdit makes it simple for you to publish online your files. Once you're happy with a file, you can publish it to different hosting platforms like **Blogger**, **Dropbox**, **Gist**, **GitHub**, **Google Drive**, **WordPress** and **Zendesk**. With [Handlebars templates](http://handlebarsjs.com/), you have full control over what you export.
-
-> Before starting to publish, you must link an account in the **Publish** sub-menu.
-
-## Publish a File
-
-You can publish your file by opening the **Publish** sub-menu and by clicking **Publish to**. For some locations, you can choose between the following formats:
-
-- Markdown: publish the Markdown text on a website that can interpret it (**GitHub** for instance),
-- HTML: publish the file converted to HTML via a Handlebars template (on a blog for example).
-
-## Update a publication
-
-After publishing, StackEdit keeps your file linked to that publication which makes it easy for you to re-publish it. Once you have modified your file and you want to update your publication, click on the **Publish now** button in the navigation bar.
-
-> **Note:** The **Publish now** button is disabled if your file has not been published yet.
-
-## Manage file publication
-
-Since one file can be published to multiple locations, you can list and manage publish locations by clicking **File publication** in the **Publish** sub-menu. This allows you to list and remove publication locations that are linked to your file.
+![](https://github.com/zaknafein83/installazione-Docker-tramite-WSL/blob/master/get-ubuntu.png)
 
 
-# Markdown extensions
+### Installazione Docker tramite WSL/Bash Linux
 
-StackEdit extends the standard Markdown syntax by adding extra **Markdown extensions**, providing you with some nice features.
+Avviate la versione di Ubuntu precedentemente installata e lanciate i seguenti comandi:
+#### Impostare la repo di docker
 
-> **ProTip:** You can disable any **Markdown extension** in the **File properties** dialog.
+     sudo apt-get update
+     sudo apt-get install \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release
+
+> N.B. i comandi sono inviati in sequenza, quindi attenzione che la sequenza venga rispettata 
+#### Inserire la chiave GPG KEY ufficiale di Docker
+
+     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    
+> Usare la GPG di riferimento della vostra distribuzione precedentemente installata. Nel nostro caso, la ubunt/gpg è quella corretta.
+#### Impostare la repository per scaricare Docker
+
+      echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+#### Installare Docker Engine
+
+    sudo apt-get update
+    sudo apt-get install docker-ce docker-ce-cli containerd.io
+#### Avviare il processo di Docker
+
+    sudo /etc/init.d/docker start
+Infine per fare un test di verifica :
+
+    sudo docker run hello-world
+###	Installazione Docker-Compose 
+
+Adesso bisogna installare docker-compose per fare la build dei file docker compose yml. Eseguire i seguenti comandi dalla bash linux.
+#### Scaricare l'ultima versione di docker-compose
+
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+#### Cambiare i permessi dei file
+
+    sudo chmod +x /usr/local/bin/docker-compose
+#### Controllare la versione del Compose
+
+    sudo docker–compose --version
+
+A questo punto possiamo utilizzare i comandi di **linux** direttamente da **Powershell** senza passare per la **bash ubuntu**, basterà iniziare il qualsiasi riga di linux con **WSL**.
+Ecco come lancio il compose tramite WSL
+
+    wsl sudo docker-compose -f docker-compose.yml up
 
 
-## SmartyPants
+siamo pronti per usare **docker** tramite **wsl** senza **docker desktop**.
 
-SmartyPants converts ASCII punctuation characters into "smart" typographic punctuation HTML entities. For example:
-
-|                |ASCII                          |HTML                         |
-|----------------|-------------------------------|-----------------------------|
-|Single backticks|`'Isn't this fun?'`            |'Isn't this fun?'            |
-|Quotes          |`"Isn't this fun?"`            |"Isn't this fun?"            |
-|Dashes          |`-- is en-dash, --- is em-dash`|-- is en-dash, --- is em-dash|
+![enter image description here](https://www.docker.com/wp-content/uploads/2021/09/Moby-run.png)
 
 
-## KaTeX
+## Credit
 
-You can render LaTeX mathematical expressions using [KaTeX](https://khan.github.io/KaTeX/):
-
-The *Gamma function* satisfying $\Gamma(n) = (n-1)!\quad\forall n\in\mathbb N$ is via the Euler integral
-
-$$
-\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
-$$
-
-> You can find more information about **LaTeX** mathematical expressions [here](http://meta.math.stackexchange.com/questions/5020/mathjax-basic-tutorial-and-quick-reference).
-
-
-## UML diagrams
-
-You can render UML diagrams using [Mermaid](https://mermaidjs.github.io/). For example, this will produce a sequence diagram:
-
-```mermaid
-sequenceDiagram
-Alice ->> Bob: Hello Bob, how are you?
-Bob-->>John: How about you John?
-Bob--x Alice: I am good thanks!
-Bob-x John: I am good thanks!
-Note right of John: Bob thinks a long<br/>long time, so long<br/>that the text does<br/>not fit on a row.
-
-Bob-->Alice: Checking with John...
-Alice->John: Yes... John, how are you?
-```
-
-And this will produce a flow chart:
-
-```mermaid
-graph LR
-A[Square Rect] -- Link text --> B((Circle))
-A --> C(Round Rect)
-B --> D{Rhombus}
-C --> D
-```
+Questo documento nasce da una esigenza aziendale e prende spunto da un documento redatto in prima istanza da [Francesco Lombardi](https://github.com/Francesco-Lombardi). Tutte le informazioni sono reperibili sul web in autonomia, con il presente documento si vuole dare una guidelines.
